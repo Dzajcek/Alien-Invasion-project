@@ -1,0 +1,56 @@
+import os
+import pygame
+from pygame.sprite import Sprite
+
+class Ship(Sprite):
+    # Klasa przeznaczona do zarzadzania statkiem kosmicznym.
+
+    def __init__(self, ai_game, is_heart=False):
+        # Inicjalizacja statku kosmicznego i jego polozenie poczatkowe.
+        super().__init__()
+        self.screen = ai_game.screen
+        self.settings = ai_game.settings
+        self.screen_rect = ai_game.screen.get_rect()
+
+        # Wczytanie odpowiedniego obrazu
+        current_path = os.path.dirname(__file__)
+        if is_heart:
+            image_path = os.path.join(current_path, 'images', 'heart.bmp')
+        else:
+            image_path = os.path.join(current_path, 'images', 'ship.bmp')
+
+        self.image = pygame.image.load(image_path)
+        self.rect = self.image.get_rect()
+        # Wczytanie obrazu statku kosmicznego i pobranie jego prostokata.
+        current_path = os.path.dirname(__file__)
+
+        # Każdy nowy statek kosmiczny pojawia sie na dole ekranu.
+        self.rect.midbottom = self.screen_rect.midbottom
+
+        # Położenie poziome statku jest przechowywane w postaci liczby zmiennoprzecinkowej
+        self.x = float(self.rect.x)
+
+        # Opcje wskazujace na poruszanie sie statku.
+        self.moving_right = False
+        self.moving_left = False
+
+    def update(self):
+        # Uaktualnienie polozenia statku na podstawie opcji wskazujacej na jego ruch.
+
+        # Uaktualnienie wartosci wspolrzednej X statku, a nie jego prostokata.
+        if self.moving_right and self.rect.right < self.screen_rect.right:
+            self.x += self.settings.ship_speed
+        if self.moving_left and self.rect.left > 0:
+            self.x -= self.settings.ship_speed
+
+        # Uaktualnienie obiektu rect na podstawie wartosci self.x
+        self.rect.x = self.x
+
+    def blitme(self):
+        # Wyświetlenie statku kosmicznego w jego aktualnym polozeniu.
+        self.screen.blit(self.image, self.rect)
+
+    def center_ship(self):
+        # Umieszczenie statku na srodku przy dolnej krawedzi ekranu.
+        self.rect.midbottom = self.screen_rect.midbottom
+        self.x = float(self.rect.x)
